@@ -10,3 +10,25 @@ body {
 .table tbody tr td {
   vertical-align: middle;
 }
+
+h1 {
+  margin-bottom: 40px;
+}
+
+.notice {
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+ul.error {
+  li {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    color: #a94442;
+  }
+  display: block;
+  padding: 15px 30px;
+  margin: 0 0 20px;
+  background: #f2dede;
+  border-left: 3px solid #a94442;
+}

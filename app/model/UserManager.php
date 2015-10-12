@@ -19,6 +19,9 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
         COLUMN_EMAIL = 'email',
 		COLUMN_ROLE = 'role';
 
+	const ROLE_USER = 'user';
+	const ROLE_ADMIN = 'admin';
+
 
 	/** @var Nette\Database\Context */
 	private $database;
