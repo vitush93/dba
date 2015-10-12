@@ -4,7 +4,6 @@ namespace App\Presenters;
 
 use App\Model;
 use Libs\BootstrapForm;
-use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
 use Nette\Database\Context;
 
@@ -20,18 +19,8 @@ class HomepagePresenter extends BasePresenter
     function actionDefault()
     {
         if ($this->user->isInRole(Model\UserManager::ROLE_ADMIN)) {
-            $this->redirect('admin');
+            $this->redirect('Admin:default');
         }
-    }
-
-    function actionAdmin()
-    {
-        if (!$this->user->isInRole(Model\UserManager::ROLE_ADMIN)) throw new BadRequestException;
-    }
-
-    function renderAdmin()
-    {
-
     }
 
     function renderDefault()

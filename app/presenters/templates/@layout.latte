@@ -31,7 +31,10 @@
 
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
                         <ul class="nav navbar-nav">
-                            <li class="active"><a href="{link Homepage:default}"><i class="glyphicon glyphicon-dashboard"></i> Dashboard</a></li>
+                            <li{ifCurrent Homepage:*} class="active"{/ifCurrent}{ifCurrent Admin:default} class="active"{/ifCurrent}><a href="{link Homepage:default}">Dashboard</a></li>
+                            {if $user->isInRole('admin')}
+                                <li{ifCurrent Admin:projects} class="active"{/ifCurrent}><a href="{link Admin:projects}">Projects</a></li>
+                            {/if}
                         </ul>
 
                         <ul class="nav navbar-nav navbar-right">
