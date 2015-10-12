@@ -32,7 +32,7 @@
 		"latte/latte": "~2.3.0",
 		"tracy/tracy": "~2.3.0",
 		"dg/adminer-custom": "~1.6",
-	  	"kdyby/bootstrap-form-renderer": "*"
+	  	"erusev/parsedown": "~1.6.0"
 	},
 	"require-dev": {
 		"nette/tester": "~1.3"

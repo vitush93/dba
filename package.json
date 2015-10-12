@@ -11,7 +11,8 @@
   "browser": {
     "jquery": "./bower_components/jquery/dist/jquery.js",
     "bootstrap": "./bower_components/bootstrap-sass/assets/javascripts/bootstrap.js",
-    "underscore": "./bower_components/underscore/underscore.js"
+    "underscore": "./bower_components/underscore/underscore.js",
+    "nette": "./bower_components/nette.ajax.js/nette.ajax.js"
   },
   "devDependencies": {
     "grunt": "~0.4.5",

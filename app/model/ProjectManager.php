@@ -59,4 +59,13 @@ class ProjectManager extends Object
     {
         return $this->database->table(self::TABLE_NAME)->where('users_id', $user_id)->fetchAll();
     }
+
+    /**
+     * @param $project_id
+     * @return array|\Nette\Database\Table\IRow[]
+     */
+    function solutions($project_id)
+    {
+        return $this->database->table('solutions')->where('projects_id', $project_id)->order('uploaded DESC')->fetchAll();
+    }
 }

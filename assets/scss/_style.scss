@@ -2,13 +2,17 @@ body {
   background: $bgcolor;
 }
 
-#flashes {
+.flash:first-child {
   margin-top: 40px;
+}
+
+.flash:last-child {
   margin-bottom: 40px;
 }
 
 .table tbody tr td {
   vertical-align: middle;
+  font-size: 13px;
 }
 
 h1 {
@@ -39,4 +43,25 @@ ul.error {
 
 .section-title {
   margin-top: 40px;
+}
+
+.comment-responses {
+  small {
+    color: #777;
+    font-size: 12px;
+  }
+}
+
+.comment-response {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.comment-reply {
+  display: inline-block;
+  margin-top: 10px;
+}
+
+textarea {
+  resize: none;
 }

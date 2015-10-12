@@ -4,7 +4,7 @@
 
 -- Dumped from database version 9.4.5
 -- Dumped by pg_dump version 9.4.0
--- Started on 2015-10-12 17:17:34
+-- Started on 2015-10-12 21:25:39
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -24,7 +24,7 @@ CREATE SCHEMA dba;
 ALTER SCHEMA dba OWNER TO postgres;
 
 --
--- TOC entry 179 (class 3079 OID 11855)
+-- TOC entry 181 (class 3079 OID 11855)
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
 --
 
@@ -32,8 +32,8 @@ CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
--- TOC entry 2042 (class 0 OID 0)
--- Dependencies: 179
+-- TOC entry 2055 (class 0 OID 0)
+-- Dependencies: 181
 -- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
 --
 
@@ -53,11 +53,11 @@ SET default_with_oids = false;
 
 CREATE TABLE comments (
     id integer NOT NULL,
-    comments_id integer DEFAULT 0 NOT NULL,
+    comments_id integer,
     users_id integer NOT NULL,
-    solution integer DEFAULT 0 NOT NULL,
     text text NOT NULL,
-    projects_id integer NOT NULL
+    projects_id integer NOT NULL,
+    posted timestamp without time zone DEFAULT statement_timestamp() NOT NULL
 );
 
 
@@ -79,7 +79,7 @@ CREATE SEQUENCE comments_id_seq
 ALTER TABLE comments_id_seq OWNER TO postgres;
 
 --
--- TOC entry 2043 (class 0 OID 0)
+-- TOC entry 2056 (class 0 OID 0)
 -- Dependencies: 177
 -- Name: comments_id_seq; Type: SEQUENCE OWNED BY; Schema: dba; Owner: postgres
 --
@@ -96,13 +96,24 @@ CREATE TABLE projects (
     id integer NOT NULL,
     name character varying(255) NOT NULL,
     description text NOT NULL,
-    accepted boolean DEFAULT false NOT NULL,
     created timestamp without time zone DEFAULT statement_timestamp() NOT NULL,
-    users_id integer NOT NULL
+    users_id integer NOT NULL,
+    accepted integer DEFAULT 0 NOT NULL
 );
 
 
 ALTER TABLE projects OWNER TO postgres;
+
+--
+-- TOC entry 2057 (class 0 OID 0)
+-- Dependencies: 176
+-- Name: COLUMN projects.accepted; Type: COMMENT; Schema: dba; Owner: postgres
+--
+
+COMMENT ON COLUMN projects.accepted IS '0 = awating action
+1 = accepted
+2 = declined';
+
 
 --
 -- TOC entry 175 (class 1259 OID 16437)
@@ -120,12 +131,52 @@ CREATE SEQUENCE projects_id_seq
 ALTER TABLE projects_id_seq OWNER TO postgres;
 
 --
--- TOC entry 2044 (class 0 OID 0)
+-- TOC entry 2058 (class 0 OID 0)
 -- Dependencies: 175
 -- Name: projects_id_seq; Type: SEQUENCE OWNED BY; Schema: dba; Owner: postgres
 --
 
 ALTER SEQUENCE projects_id_seq OWNED BY projects.id;
+
+
+--
+-- TOC entry 180 (class 1259 OID 16517)
+-- Name: solutions; Type: TABLE; Schema: dba; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE solutions (
+    id integer NOT NULL,
+    projects_id integer NOT NULL,
+    file character varying(255) NOT NULL,
+    note text,
+    uploaded timestamp without time zone DEFAULT statement_timestamp() NOT NULL
+);
+
+
+ALTER TABLE solutions OWNER TO postgres;
+
+--
+-- TOC entry 179 (class 1259 OID 16515)
+-- Name: solutions_id_seq; Type: SEQUENCE; Schema: dba; Owner: postgres
+--
+
+CREATE SEQUENCE solutions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE solutions_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 2059 (class 0 OID 0)
+-- Dependencies: 179
+-- Name: solutions_id_seq; Type: SEQUENCE OWNED BY; Schema: dba; Owner: postgres
+--
+
+ALTER SEQUENCE solutions_id_seq OWNED BY solutions.id;
 
 
 --
@@ -146,7 +197,7 @@ CREATE TABLE users (
 ALTER TABLE users OWNER TO postgres;
 
 --
--- TOC entry 2045 (class 0 OID 0)
+-- TOC entry 2060 (class 0 OID 0)
 -- Dependencies: 173
 -- Name: COLUMN users.username; Type: COMMENT; Schema: dba; Owner: postgres
 --
@@ -171,7 +222,7 @@ CREATE SEQUENCE user_id_seq
 ALTER TABLE user_id_seq OWNER TO postgres;
 
 --
--- TOC entry 2046 (class 0 OID 0)
+-- TOC entry 2061 (class 0 OID 0)
 -- Dependencies: 174
 -- Name: user_id_seq; Type: SEQUENCE OWNED BY; Schema: dba; Owner: postgres
 --
@@ -180,7 +231,7 @@ ALTER SEQUENCE user_id_seq OWNED BY users.id;
 
 
 --
--- TOC entry 1901 (class 2604 OID 16456)
+-- TOC entry 1908 (class 2604 OID 16456)
 -- Name: id; Type: DEFAULT; Schema: dba; Owner: postgres
 --
 
@@ -188,7 +239,7 @@ ALTER TABLE ONLY comments ALTER COLUMN id SET DEFAULT nextval('comments_id_seq':
 
 
 --
--- TOC entry 1898 (class 2604 OID 16442)
+-- TOC entry 1905 (class 2604 OID 16442)
 -- Name: id; Type: DEFAULT; Schema: dba; Owner: postgres
 --
 
@@ -196,7 +247,15 @@ ALTER TABLE ONLY projects ALTER COLUMN id SET DEFAULT nextval('projects_id_seq':
 
 
 --
--- TOC entry 1897 (class 2604 OID 16427)
+-- TOC entry 1910 (class 2604 OID 16520)
+-- Name: id; Type: DEFAULT; Schema: dba; Owner: postgres
+--
+
+ALTER TABLE ONLY solutions ALTER COLUMN id SET DEFAULT nextval('solutions_id_seq'::regclass);
+
+
+--
+-- TOC entry 1904 (class 2604 OID 16427)
 -- Name: id; Type: DEFAULT; Schema: dba; Owner: postgres
 --
 
@@ -204,7 +263,7 @@ ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('user_id_seq'::regcla
 
 
 --
--- TOC entry 1921 (class 2606 OID 16462)
+-- TOC entry 1929 (class 2606 OID 16462)
 -- Name: PK_comments; Type: CONSTRAINT; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -213,7 +272,7 @@ ALTER TABLE ONLY comments
 
 
 --
--- TOC entry 1915 (class 2606 OID 16449)
+-- TOC entry 1923 (class 2606 OID 16449)
 -- Name: PK_projects; Type: CONSTRAINT; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -222,7 +281,16 @@ ALTER TABLE ONLY projects
 
 
 --
--- TOC entry 1905 (class 2606 OID 16429)
+-- TOC entry 1932 (class 2606 OID 16525)
+-- Name: PK_solutions; Type: CONSTRAINT; Schema: dba; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY solutions
+    ADD CONSTRAINT "PK_solutions" PRIMARY KEY (id);
+
+
+--
+-- TOC entry 1913 (class 2606 OID 16429)
 -- Name: PK_users; Type: CONSTRAINT; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -231,7 +299,7 @@ ALTER TABLE ONLY users
 
 
 --
--- TOC entry 1907 (class 2606 OID 16431)
+-- TOC entry 1915 (class 2606 OID 16431)
 -- Name: UNIQ_email; Type: CONSTRAINT; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -240,7 +308,7 @@ ALTER TABLE ONLY users
 
 
 --
--- TOC entry 1909 (class 2606 OID 16433)
+-- TOC entry 1917 (class 2606 OID 16433)
 -- Name: UNIQ_username; Type: CONSTRAINT; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -249,7 +317,7 @@ ALTER TABLE ONLY users
 
 
 --
--- TOC entry 1917 (class 1259 OID 16498)
+-- TOC entry 1925 (class 1259 OID 16498)
 -- Name: FKI_comments_comments; Type: INDEX; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -257,7 +325,7 @@ CREATE INDEX "FKI_comments_comments" ON comments USING btree (comments_id);
 
 
 --
--- TOC entry 1918 (class 1259 OID 16492)
+-- TOC entry 1926 (class 1259 OID 16492)
 -- Name: FKI_comments_projects; Type: INDEX; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -265,7 +333,7 @@ CREATE INDEX "FKI_comments_projects" ON comments USING btree (projects_id);
 
 
 --
--- TOC entry 1919 (class 1259 OID 16486)
+-- TOC entry 1927 (class 1259 OID 16486)
 -- Name: FKI_comments_users; Type: INDEX; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -273,7 +341,7 @@ CREATE INDEX "FKI_comments_users" ON comments USING btree (users_id);
 
 
 --
--- TOC entry 1913 (class 1259 OID 16504)
+-- TOC entry 1921 (class 1259 OID 16504)
 -- Name: FKI_projects_users; Type: INDEX; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -281,7 +349,15 @@ CREATE INDEX "FKI_projects_users" ON projects USING btree (users_id);
 
 
 --
--- TOC entry 1910 (class 1259 OID 16434)
+-- TOC entry 1930 (class 1259 OID 16531)
+-- Name: FKI_solutions_projects; Type: INDEX; Schema: dba; Owner: postgres; Tablespace: 
+--
+
+CREATE INDEX "FKI_solutions_projects" ON solutions USING btree (projects_id);
+
+
+--
+-- TOC entry 1918 (class 1259 OID 16434)
 -- Name: email; Type: INDEX; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -289,7 +365,7 @@ CREATE INDEX email ON users USING btree (email);
 
 
 --
--- TOC entry 1916 (class 1259 OID 16450)
+-- TOC entry 1924 (class 1259 OID 16450)
 -- Name: idx_projects_created; Type: INDEX; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -297,7 +373,15 @@ CREATE INDEX idx_projects_created ON projects USING btree (id);
 
 
 --
--- TOC entry 1911 (class 1259 OID 16435)
+-- TOC entry 1933 (class 1259 OID 16542)
+-- Name: idx_uploaded; Type: INDEX; Schema: dba; Owner: postgres; Tablespace: 
+--
+
+CREATE INDEX idx_uploaded ON solutions USING btree (uploaded);
+
+
+--
+-- TOC entry 1919 (class 1259 OID 16435)
 -- Name: role; Type: INDEX; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -305,7 +389,7 @@ CREATE INDEX role ON users USING hash (role);
 
 
 --
--- TOC entry 1912 (class 1259 OID 16436)
+-- TOC entry 1920 (class 1259 OID 16436)
 -- Name: username; Type: INDEX; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -313,7 +397,7 @@ CREATE INDEX username ON users USING btree (username);
 
 
 --
--- TOC entry 1925 (class 2606 OID 16493)
+-- TOC entry 1937 (class 2606 OID 16493)
 -- Name: FK_comments_comments; Type: FK CONSTRAINT; Schema: dba; Owner: postgres
 --
 
@@ -322,7 +406,7 @@ ALTER TABLE ONLY comments
 
 
 --
--- TOC entry 1924 (class 2606 OID 16487)
+-- TOC entry 1936 (class 2606 OID 16487)
 -- Name: FK_comments_projects; Type: FK CONSTRAINT; Schema: dba; Owner: postgres
 --
 
@@ -331,7 +415,7 @@ ALTER TABLE ONLY comments
 
 
 --
--- TOC entry 1923 (class 2606 OID 16481)
+-- TOC entry 1935 (class 2606 OID 16481)
 -- Name: FK_comments_users; Type: FK CONSTRAINT; Schema: dba; Owner: postgres
 --
 
@@ -340,7 +424,7 @@ ALTER TABLE ONLY comments
 
 
 --
--- TOC entry 1922 (class 2606 OID 16499)
+-- TOC entry 1934 (class 2606 OID 16499)
 -- Name: FK_projects_users; Type: FK CONSTRAINT; Schema: dba; Owner: postgres
 --
 
@@ -349,7 +433,16 @@ ALTER TABLE ONLY projects
 
 
 --
--- TOC entry 2041 (class 0 OID 0)
+-- TOC entry 1938 (class 2606 OID 16526)
+-- Name: FK_solutions_projects; Type: FK CONSTRAINT; Schema: dba; Owner: postgres
+--
+
+ALTER TABLE ONLY solutions
+    ADD CONSTRAINT "FK_solutions_projects" FOREIGN KEY (projects_id) REFERENCES projects(id);
+
+
+--
+-- TOC entry 2054 (class 0 OID 0)
 -- Dependencies: 5
 -- Name: public; Type: ACL; Schema: -; Owner: postgres
 --
@@ -360,7 +453,7 @@ GRANT ALL ON SCHEMA public TO postgres;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
--- Completed on 2015-10-12 17:17:34
+-- Completed on 2015-10-12 21:25:40
 
 --
 -- PostgreSQL database dump complete

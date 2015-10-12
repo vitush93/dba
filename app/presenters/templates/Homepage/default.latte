@@ -35,11 +35,77 @@
 
         {if $accepted > 0}
             <div class="row">
-                <div class="col-md-6">
-                    <h1>{$project->name}</h1>
+                <div class="col-lg-12"><h1>{$project->name}</h1></div>
+                <div class="col-md-8">
+                    <h3>Project description:</h3>
+                    {$desc|noescape}
+
+                    <h3 class="section-title">Solutions</h3>
+                    {if count($solutions) == 0}
+                        <p>You haven't submitted any solutions yet.</p>
+                    {else}
+                        <table class="table table-condensed">
+                            <tr>
+                                <th>File</th>
+                                <th>Note</th>
+                                <th>Uploaded</th>
+                                <th></th>
+                            </tr>
+                            {foreach $solutions as $s}
+                                <tr>
+                                    <td>{$s->file|substr:5}</td>
+                                    <td>{$s->note}</td>
+                                    <td>{$s->uploaded|date:'j.n.Y H:i'}</td>
+                                    <td><a href="{$basePath}/upload/{$s->file}" class="btn btn-default btn-xs"><i class="glyphicon glyphicon-download"></i> Download</a></td>
+                                </tr>
+                            {/foreach}
+                        </table>
+                    {/if}
+
+                    <div class="row">
+                        <div class="col-xs-8">
+                            <h3 class="section-title" style="margin-bottom: 40px;">Upload a solution</h3>
+                            {control solutionForm}
+                        </div>
+                        <div class="col-xs-4"></div>
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <h4 class="section-title">Comments</h4>
+                <div class="col-md-4">
+                    <h3>Comments</h3>
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <textarea placeholder="write a new comment.." id="new-comment" class="form-control"></textarea>
+                            <span class="pull-left" style="margin-top: 10px;font-size: 12px;color: #999">markdown supported</span>
+                            <button class="btn btn-success btn-xs pull-right" id="js-comment" style="margin-top: 10px">post comment</button>
+                        </div>
+                    </div>
+
+                    <div id="js-comments">
+                        {foreach $comments as $c}
+                        <div class="panel panel-default comment">
+                            <div class="panel-body">
+                                <div class="comment-header">
+                                    {var $u = $c->ref('users')}
+                                    <h4>{$u->name ? $u->name : $u->username} <small>{$c->posted|date:'j.n.Y H:i'}</small></h4>
+                                </div>
+                                <div class="comment-body">
+                                    {$c->text|noescape}
+                                </div>
+                            </div>
+                            <div class="panel-footer comment-responses">
+                                <div class="js-reply-container">
+                                    {foreach $c->related('comments') as $r}
+                                        {var $ur = $r->ref('users')}
+                                        <div class="comment-response">
+                                            <strong>{$ur->name ? $ur->name : $ur->username}</strong> {$r->text}<br><small>{$r->posted|date:'j.n.Y H:i'}</small>
+                                        </div>
+                                    {/foreach}
+                                </div>
+                                <textarea placeholder="write a response.." data-comment="{$c->id}" id="new-response" class="form-control js-reply"></textarea>
+                            </div>
+                        </div>
+                        {/foreach}
+                    </div>
                 </div>
             </div>
         {/if}
