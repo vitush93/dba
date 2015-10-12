@@ -108,8 +108,8 @@ ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('user_id_seq'::regcla
 -- Name: PRIMARY; Type: CONSTRAINT; Schema: dba; Owner: postgres; Tablespace:
 --
 
-ALTER TABLE ONLY users
-    ADD CONSTRAINT "PRIMARY" PRIMARY KEY (id);
+ALTER TABLE users
+    ADD CONSTRAINT "PK_users" PRIMARY KEY(id);
 
 
 --
