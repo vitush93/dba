@@ -14,7 +14,8 @@ var Comments = {
         this.$comment.click(function () {
             var comment = _this.$text.val();
 
-            $.get('/?text=' + comment + '&do=comment', function (data) {
+            //$.get('/?text=' + comment + '&do=comment', function (data) {
+            $.get('', {"text": comment, "do": "comment"}, function (data) {
                 _this.$container.prepend(CommentTemplate(data));
 
                 _this.$text.val('');
@@ -29,7 +30,8 @@ var Comments = {
                 var comment = $(this).data('comment');
 
                 var $this = $(this);
-                $.get('/?text=' + text + '&comment=' + comment + '&do=reply', function (data) {
+                //$.get('/?text=' + text + '&comment=' + comment + '&do=reply', function (data) {
+                $.get('', {"text": text, "comment": comment, "do": "reply"}, function (data) {
                     $this.parents('.comment-responses').find('.js-reply-container').append(ReplyTemplate(data));
                 });
                 $this.val('');

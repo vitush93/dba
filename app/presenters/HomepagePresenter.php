@@ -2,10 +2,12 @@
 
 namespace App\Presenters;
 
+use App\Forms\SolutionFormFactory;
 use App\Model;
 use Libs\BootstrapForm;
 use Nette\Application\UI\Form;
 use Nette\Database\Context;
+use Tracy\Debugger;
 
 
 class HomepagePresenter extends BasePresenter
@@ -16,9 +18,15 @@ class HomepagePresenter extends BasePresenter
     /** @var Context @inject */
     public $database;
 
+    /** @var SolutionFormFactory @inject */
+    public $solutionFormFactory;
+
+    /** @var Model\CommentingService @inject */
+    public $commentingService;
+
     function actionDefault()
     {
-        if ($this->user->isInRole(Model\UserManager::ROLE_ADMIN)) {
+        if ($this->user->isInRole(Model\UserManager::ROLE_ADMIN) && !$this->isAjax()) {
             $this->redirect('Admin:default');
         }
     }
@@ -50,75 +58,33 @@ class HomepagePresenter extends BasePresenter
             $this->template->solutions = $this->projectManager->solutions($project->id);
             $this->template->comments = $this->database->table('comments')->where(array(
                 'comments_id' => null,
-                'users_id' => $this->user->id
+                'projects_id' => $project->id
             ))->order('posted DESC');
+            $this->template->parsedown = $parsedown;
         }
     }
 
     function handleComment($text)
     {
-        $inserted = $this->database->table('comments')->insert(array(
-            'users_id' => $this->user->id,
-            'text' => $text,
-            'projects_id' => $this->projectManager->accepted($this->user->id)->id
-        ));
+        try {
+            $project_id = $this->projectManager->accepted($this->user->id)->id;
+            $response = $this->commentingService->comment($this->user->id, $project_id, $text);
 
-        if ($inserted) {
-            $parsedown = new \Parsedown();
-            $user = $inserted->ref('users');
-            $name = $user->name ? $user->name : $user->username;
-
-            $this->sendJson(array(
-                'text' => $parsedown->parse($inserted->text),
-                'posted' => $inserted->posted->format('j.n.Y H:i'),
-                'author' => $name,
-                'id' => $inserted->id
-            ));
+            $this->sendResponse($response);
+        } catch (Model\CommentingException $e) {
+            Debugger::log($e);
         }
     }
 
     function handleReply($text, $comment)
     {
-        $checkComment = $this->database->table('comments')->where(array(
-                'users_id' => $this->user->id,
-                'id' => $comment
-            ))->count() > 0;
+        try {
+            $project_id = $this->projectManager->accepted($this->user->id)->id;
+            $response = $this->commentingService->reply($this->user->id, $project_id, $text, $comment);
 
-        if ($checkComment) {
-            $inserted = $this->database->table('comments')->insert(array(
-                'users_id' => $this->user->id,
-                'text' => $text,
-                'projects_id' => $this->projectManager->accepted($this->user->id)->id,
-                'comments_id' => $comment
-            ));
-
-            if ($inserted) {
-                $user = $inserted->ref('users');
-                $name = $user->name ? $user->name : $user->username;
-
-                $this->sendJson(array(
-                    'text' => $inserted->text,
-                    'posted' => $inserted->posted->format('j.n.Y H:i'),
-                    'author' => $name
-                ));
-            }
-        }
-    }
-
-    /**
-     * @param Form $form
-     * @param $values
-     */
-    function solutionFormSucceeded(Form $form, $values)
-    {
-        if ($values->file->isOk()) {
-            $values->projects_id = $this->projectManager->accepted($this->user->id)->id;
-            $values->file = Model\FileUploadHandler::upload($values->file);
-            $this->database->table('solutions')->insert($values);
-
-            $this->flashMessage('Solution has been successfully uploaded.', 'success');
-        } else {
-            $this->flashMessage('Something went wrong while uploading a file :( .', 'danger');
+            $this->sendResponse($response);
+        } catch (Model\CommentingException $e) {
+            Debugger::log($e);
         }
     }
 
@@ -137,15 +103,9 @@ class HomepagePresenter extends BasePresenter
      */
     function createComponentSolutionForm()
     {
-        $form = new Form();
+        $form = $this->solutionFormFactory->create();
 
-        $form->addUpload('file', 'Select file')->setRequired();
-        $form->addTextArea('note', 'Your note');
-        $form->addSubmit('process', 'Upload');
-
-        $form->onSuccess[] = $this->solutionFormSucceeded;
-
-        return BootstrapForm::makeBootstrap($form);
+        return $form;
     }
 
     /**

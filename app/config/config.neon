@@ -23,4 +23,6 @@ services:
 	- App\Model\UserManager
 	- App\Model\ProjectManager
 	- App\Forms\SignFormFactory
+	- App\Forms\SolutionFormFactory
+	- App\Model\CommentingService
 	router: App\RouterFactory::createRouter

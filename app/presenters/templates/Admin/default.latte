@@ -2,10 +2,11 @@
 
     <div class="container" id="admin-panel">
     <div class="row">
+        {if count($projects) > 0}
         <div class="col-lg-12">
-            <div class="panel panel-success">
+            <div class="panel panel-danger">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Projects to review</h3>
+                    <h3 class="panel-title">Projects awaiting action</h3>
                 </div>
                 <div class="panel-body">
                     <table class="table table-condensed">
@@ -15,23 +16,27 @@
                             <th>Student</th>
                             <th style="width:100px"></th>
                         </tr>
-                        {for $i = 0; $i < 10; $i++}
+                        {foreach $projects as $p}
+                            {var $u = $p->ref('users')}
                             <tr>
-                                <td>10.12.2015 22:48</td>
-                                <td><a href="">Something</a></td>
-                                <td>Vit Habada</td>
+                                <td>{$p->created|date:'j.n.Y H:i'}</td>
+                                <td><a href="{link Admin:project $p->id}">{$p->name}</a></td>
+                                <td>{$u->name ? $u->name : $u->username}</td>
                                 <td>
-                                    <button class="js-resolve btn btn-success btn-xs" onclick="return confirm('Are you sure?')" title="accept"><i class="glyphicon glyphicon-check"></i></button>
+                                    <button class="js-resolve btn btn-success btn-xs" onclick="return confirm('Are you sure?')" title="accept"><i class="glyphicon glyphicon-ok"></i></button>
                                     <button class="js-resolve btn btn-danger btn-xs" onclick="return confirm('Are you sure?')" title="decline"><i class="glyphicon glyphicon-remove"></i></button>
                                 </td>
                             </tr>
-                        {/for}
+                        {/foreach}
                     </table>
                 </div>
             </div>
         </div>
+        {/if}
+
+        {if count($solutions) > 0}
         <div class="col-lg-12">
-            <div class="panel panel-success">
+            <div class="panel panel-info">
                 <div class="panel-heading">
                     <h3 class="panel-title">Solutions to review</h3>
                 </div>
@@ -44,23 +49,27 @@
                             <th>Note</th>
                             <th style="width:50px"></th>
                         </tr>
-                        {for $i = 0; $i < 10; $i++}
+                        {foreach $solutions as $s}
+                            {var $u = $s->ref('projects')->ref('users')}
                             <tr>
-                                <td>10.12.2015 22:48</td>
-                                <td><a href="">Something</a></td>
-                                <td>Vit Habada</td>
-                                <td>this is a new revision</td>
+                                <td>{$s->uploaded|date:'j.n.Y H:i'}</td>
+                                <td><a href="{link Admin:project $s->ref('projects')->id}">{$s->ref('projects')->name}</a></td>
+                                <td>{$u->name ? $u->name : $u->username}</td>
+                                <td>{$s->note}</td>
                                 <td>
-                                    <button class="js-resolve btn btn-success btn-xs"><i class="glyphicon glyphicon-check"></i></button>
+                                    <button class="js-resolve btn btn-info btn-xs"><i class="glyphicon glyphicon-check"></i></button>
                                 </td>
                             </tr>
-                        {/for}
+                        {/foreach}
                     </table>
                 </div>
             </div>
         </div>
+        {/if}
+
+        {if count($comments) > 0}
         <div class="col-lg-12">
-            <div class="panel panel-success">
+            <div class="panel panel-info">
                 <div class="panel-heading">
                     <h3 class="panel-title">Unresolved comments</h3>
                 </div>
@@ -73,20 +82,22 @@
                             <th>Text</th>
                             <th style="width:50px"></th>
                         </tr>
-                        {for $i = 0; $i < 10; $i++}
+                        {foreach $comments as $c}
+                            {var $u = $c->ref('users')}
                             <tr>
-                                <td>10.12.2015 22:48</td>
-                                <td>Something</td>
-                                <td>Vit Habada</td>
-                                <td>this is a comment text</td>
+                                <td>{$c->posted|date:'j.n.Y H:i'}</td>
+                                <td><a href="{link Admin:project $c->ref('projects')->id}">{$c->ref('projects')->name}</a></td>
+                                <td>{$u->name ? $u->name : $u->username}</td>
+                                <td>{$c->text|striptags|truncate:50}</td>
                                 <td>
-                                    <button class="js-resolve btn btn-success btn-xs"><i class="glyphicon glyphicon-check"></i></button>
+                                    <button class="js-resolve btn btn-info btn-xs"><i class="glyphicon glyphicon-check"></i></button>
                                 </td>
                             </tr>
-                        {/for}
+                        {/foreach}
                     </table>
                 </div>
             </div>
+            {/if}
         </div>
     </div>
 
