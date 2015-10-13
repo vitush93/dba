@@ -110,13 +110,10 @@
                         </table>
                     {/if}
                     {if $user->isInRole('user')}
-                    <div class="row">
-                        <div class="col-xs-8">
                             <h3 class="section-title" style="margin-bottom: 40px;">Upload a solution</h3>
-                            {control solutionForm}
-                        </div>
-                        <div class="col-xs-4"></div>
-                    </div>
+                            <div class="form-gray">
+                                {control solutionForm}
+                            </div>
                     {/if}
                 </div>
                 </div>
