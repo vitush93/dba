@@ -30,7 +30,7 @@
                             <tr>
                                 <td>{$p->created|date:'j.n.Y H:i'}</td>
                                 <td><a href="{link Admin:project $p->id}">{$p->name}</a></td>
-                                <td>{$u->name ? $u->name : $u->username}</td>
+                                <td>{$u->name ? $u->name : $u->username}{if $u->email} (<a href="mailto:{$u->email}">{$u->email}</a>){/if}</td>
                                 <td>
                                     <a href="{link accept! $p->id}" class="js-resolve btn btn-success btn-xs" onclick="return confirm('Are you sure?')" title="accept"><i class="glyphicon glyphicon-ok"></i></a>
                                     <a href="{link decline! $p->id}" class="js-resolve btn btn-danger btn-xs" onclick="return confirm('Are you sure?')" title="decline"><i class="glyphicon glyphicon-remove"></i></a>
@@ -63,7 +63,7 @@
                             <tr>
                                 <td>{$s->uploaded|date:'j.n.Y H:i'}</td>
                                 <td><a href="{link Admin:project $s->ref('projects')->id}">{$s->ref('projects')->name}</a></td>
-                                <td>{$u->name ? $u->name : $u->username}</td>
+                                <td>{$u->name ? $u->name : $u->username}{if $u->email} (<a href="mailto:{$u->email}">{$u->email}</a>){/if}</td>
                                 <td>{$s->note}</td>
                                 <td>
                                     <button class="js-resolve btn btn-info btn-xs"><i class="glyphicon glyphicon-check"></i></button>
@@ -96,7 +96,7 @@
                             <tr>
                                 <td>{$c->posted|date:'j.n.Y H:i'}</td>
                                 <td><a href="{link Admin:project $c->ref('projects')->id}">{$c->ref('projects')->name}</a></td>
-                                <td>{$u->name ? $u->name : $u->username}</td>
+                                <td>{$u->name ? $u->name : $u->username}{if $u->email} (<a href="mailto:{$u->email}">{$u->email}</a>){/if}</td>
                                 <td>{$parsedown->parse($c->text)|striptags|truncate:50}</td>
                                 <td>
                                     <a href="{link seenComment! $c->id}" class="js-resolve btn btn-info btn-xs"><i class="glyphicon glyphicon-check"></i></a>

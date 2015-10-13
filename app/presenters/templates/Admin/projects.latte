@@ -33,7 +33,7 @@
                             <tr>
                                 <td>{$p->created|date:'j.n.Y H:i'}</td>
                                 <td><a href="{link Admin:project $p->id}">{$p->name}</a></td>
-                                <td>{$u->name ? $u->name : $u->username}</td>
+                                <td>{$u->name ? $u->name : $u->username}{if $u->email} (<a href="mailto:{$u->email}">{$u->email}</a>){/if}</td>
                                 <td>
                                     {var $a = $p->accepted}
                                     {if $a == 0}

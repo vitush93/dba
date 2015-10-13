@@ -138,7 +138,7 @@
                             <div class="panel-body">
                                 <div class="comment-header">
                                     {var $u = $c->ref('users')}
-                                    <h4>{$u->name ? $u->name : $u->username} <small>{$c->posted|date:'j.n.Y H:i'}</small></h4>
+                                    <h4>{$u->name ? $u->name : $u->username} <small>{$c->posted|date:'j.n.Y H:i'}{if $user->isInRole('admin') && $c->seen == null && $c->ref('users')->role != 'admin'} <span class="label label-danger">new</span>{/if}</small></h4>
                                 </div>
                                 <div class="comment-body">
                                     {$parsedown->parse($c->text)|noescape}
@@ -149,7 +149,7 @@
                                     {foreach $c->related('comments') as $r}
                                         {var $ur = $r->ref('users')}
                                         <div class="comment-response">
-                                            <strong>{$ur->name ? $ur->name : $ur->username}</strong> {$r->text}<br><small>{$r->posted|date:'j.n.Y H:i'}</small>
+                                            <strong>{$ur->name ? $ur->name : $ur->username}</strong> {$r->text}<br><small>{$r->posted|date:'j.n.Y H:i'}{if $user->isInRole('admin') && $r->seen == null && $r->ref('users')->role != 'admin'} <span class="label label-danger">new</span>{/if}</small>
                                         </div>
                                     {/foreach}
                                 </div>
