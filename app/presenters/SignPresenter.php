@@ -69,7 +69,12 @@ class SignPresenter extends BasePresenter
     function registerFormSucceeded(Form $form, $values)
     {
         try {
-            $this->userManager->add($values->username, $values->password, $values->email, UserManager::ROLE_USER);
+            $this->userManager->add(
+                $values->username,
+                $values->password,
+                $values->email,
+                UserManager::ROLE_USER,
+                $values->name);
 
             $this->flashMessage('Your account has been successfully created. You can now login.', 'success');
             $this->redirect('in');

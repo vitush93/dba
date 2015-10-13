@@ -18,4 +18,14 @@ class AdminPresenter extends BasePresenter
 
         if (!$this->user->isInRole(UserManager::ROLE_ADMIN)) throw new BadRequestException;
     }
+
+    function actionProjects()
+    {
+
+    }
+
+    function renderProjects()
+    {
+        $this->template->projects = $this->database->table('projects');
+    }
 }

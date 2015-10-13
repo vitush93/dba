@@ -4,6 +4,7 @@
     "jquery": "~2",
     "bootstrap-sass": "~3.3.5",
     "underscore": "~1.8.3",
-    "nette.ajax.js": "~2.1.0"
+    "nette.ajax.js": "~2.1.0",
+    "datatables": "~1.10"
   }
 }

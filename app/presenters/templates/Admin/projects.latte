@@ -1,5 +1,56 @@
 {block content}
 
+    <div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">All projects</h3>
+                </div>
+                <div class="panel-body">
+                    <table class="table datatables table-striped">
+                        <thead>
+                            <tr>
+                                <th>Created</th>
+                                <th>Project</th>
+                                <th>Student</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
 
+                        <tfoot>
+                            <tr>
+                                <th>Created</th>
+                                <th>Project</th>
+                                <th>Student</th>
+                                <th>Status</th>
+                            </tr>
+                        </tfoot>
+
+                        <tbody>
+                        {foreach $projects as $p}
+                            {var $u = $p->ref('users')}
+                            <tr>
+                                <td>{$p->created|date:'j.n.Y H:i'}</td>
+                                <td><a href="">{$p->name}</a></td>
+                                <td>{$u->name ? $u->name : $u->username}</td>
+                                <td>
+                                    {var $a = $p->accepted}
+                                    {if $a == 0}
+                                        Awating action
+                                    {elseif $a == 1}
+                                        Accepted
+                                    {elseif $a == 2}
+                                        Declined
+                                    {/if}
+                                </td>
+                            </tr>
+                        {/foreach}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {/block}

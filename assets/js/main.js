@@ -3,3 +3,4 @@ var $ = jQuery = require('jquery'); // load jquery, might also need window.jQuer
 var Bootstrap = require('bootstrap');
 
 require('./bindings/comment')();
+require('./bindings/datatables')();

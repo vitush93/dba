@@ -12,7 +12,9 @@
     "jquery": "./bower_components/jquery/dist/jquery.js",
     "bootstrap": "./bower_components/bootstrap-sass/assets/javascripts/bootstrap.js",
     "underscore": "./bower_components/underscore/underscore.js",
-    "nette": "./bower_components/nette.ajax.js/nette.ajax.js"
+    "nette": "./bower_components/nette.ajax.js/nette.ajax.js",
+    "datatables": "./bower_components/datatables/media/js/jquery.dataTables.js",
+    "datatables.bootstrap": "./bower_components/datatables/media/js/dataTables.bootstrap.js"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
