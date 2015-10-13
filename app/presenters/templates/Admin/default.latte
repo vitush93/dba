@@ -88,7 +88,7 @@
                                 <td>{$c->posted|date:'j.n.Y H:i'}</td>
                                 <td><a href="{link Admin:project $c->ref('projects')->id}">{$c->ref('projects')->name}</a></td>
                                 <td>{$u->name ? $u->name : $u->username}</td>
-                                <td>{$c->text|striptags|truncate:50}</td>
+                                <td>{$parsedown->parse($c->text)|striptags|truncate:50}</td>
                                 <td>
                                     <button class="js-resolve btn btn-info btn-xs"><i class="glyphicon glyphicon-check"></i></button>
                                 </td>

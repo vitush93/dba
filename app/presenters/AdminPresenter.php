@@ -102,6 +102,8 @@ class AdminPresenter extends BasePresenter
             ->where('seen', false)
             ->order('uploaded DESC')
             ->fetchAll();
+
+        $this->template->parsedown = new \Parsedown();
     }
 
     function renderProjects()

@@ -32,7 +32,7 @@
                             {var $u = $p->ref('users')}
                             <tr>
                                 <td>{$p->created|date:'j.n.Y H:i'}</td>
-                                <td><a href="">{$p->name}</a></td>
+                                <td><a href="{link Admin:project $p->id}">{$p->name}</a></td>
                                 <td>{$u->name ? $u->name : $u->username}</td>
                                 <td>
                                     {var $a = $p->accepted}
