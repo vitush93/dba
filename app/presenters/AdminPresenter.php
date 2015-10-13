@@ -43,7 +43,63 @@ class AdminPresenter extends BasePresenter
         $this->template->solutions = $this->projectManager->solutions($id);
         $this->template->comments = $project->related('comments')
             ->where('comments_id', null)
-            ->order('posted DESC');
+            ->order('bump DESC');
+    }
+
+    function handleAccept($id)
+    {
+        $this->database->table('projects')->where('id', $id)->update(array(
+            'accepted' => ProjectManager::STATUS_ACCEPTED
+        ));
+
+        $this->flashMessage('Project has been marked as accepted.', 'info');
+        $this->redirect('this');
+    }
+
+    function handleDecline($id)
+    {
+        $this->database->table('projects')->where('id', $id)->update(array(
+            'accepted' => ProjectManager::STATUS_DECLINED
+        ));
+
+        $this->flashMessage('Project has been marked as declined.', 'info');
+        $this->redirect('this');
+    }
+
+    function handleSeenSolution($id)
+    {
+        $this->database->table('solutions')->where('id', $id)->update(array(
+            'seen' => true
+        ));
+
+        $this->flashMessage('Solution has been resolved.', 'info');
+        $this->redirect('this');
+    }
+
+    function handleSeenComment($id)
+    {
+        $this->database->table('comments')->where('id', $id)->update(array(
+            'seen' => true
+        ));
+
+        $this->flashMessage('Comment has been resolved.', 'info');
+        $this->redirect('this');
+    }
+
+    function handleSeenAll()
+    {
+        $project_id = $this->getParameter('id');
+
+        $this->database->table('comments')->where('projects_id', $project_id)->update(array(
+            'seen' => true
+        ));
+
+        $this->database->table('solutions')->where('projects_id', $project_id)->update(array(
+            'seen' => true
+        ));
+
+        $this->flashMessage('All comments and solutions in project has been resolved.', 'info');
+        $this->redirect('default');
     }
 
     function handleComment($text)

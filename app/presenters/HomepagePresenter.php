@@ -59,7 +59,7 @@ class HomepagePresenter extends BasePresenter
             $this->template->comments = $this->database->table('comments')->where(array(
                 'comments_id' => null,
                 'projects_id' => $project->id
-            ))->order('posted DESC');
+            ))->order('bump DESC');
             $this->template->parsedown = $parsedown;
         }
     }

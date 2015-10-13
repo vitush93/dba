@@ -4,22 +4,32 @@ namespace App\Forms;
 
 
 use App\Model\FileUploadHandler;
+use App\Model\ProjectManager;
 use Libs\BootstrapForm;
 use Nette\Application\UI\Form;
 use Nette\Database\Context;
 use Nette\Object;
+use Nette\Security\User;
 
 class SolutionFormFactory extends Object
 {
     /** @var Context */
     private $database;
 
+    private $projectManager;
+
+    private $user;
+
     /**
+     * @param User $user
+     * @param ProjectManager $projectManager
      * @param Context $context
      */
-    function __construct(Context $context)
+    function __construct(User $user, ProjectManager $projectManager, Context $context)
     {
-        $this->database= $context;
+        $this->database = $context;
+        $this->user = $user;
+        $this->projectManager = $projectManager;
     }
 
     /**

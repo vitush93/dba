@@ -8,6 +8,7 @@ use Nette\Database\Context;
 use Nette\Neon\Exception;
 use Nette\Object;
 use Nette\Security\User;
+use Nette\Utils\DateTime;
 
 class CommentingService extends Object
 {
@@ -41,7 +42,8 @@ class CommentingService extends Object
         $inserted = $this->database->table('comments')->insert(array(
             'users_id' => $user_id,
             'text' => $text,
-            'projects_id' => $project_id
+            'projects_id' => $project_id,
+            'bump' => new DateTime()
         ));
 
         if ($inserted) {
@@ -82,6 +84,13 @@ class CommentingService extends Object
             'text' => $text,
             'projects_id' => $project_id,
             'comments_id' => $comment
+        ));
+
+        $this->database->table('comments')->where(array(
+            'projects_id' => $project_id,
+            'id' => $comment
+        ))->update(array(
+            'bump' => new DateTime()
         ));
 
         if ($inserted) {

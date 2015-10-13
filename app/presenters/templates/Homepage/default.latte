@@ -1,5 +1,40 @@
 {block title}Dashboard{/block}
 {block content}
+    {if $user->isInRole('admin')}
+    <div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                                data-target="#bs-example-navbar-collapse-2">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="#">Admin panel</a>
+                    </div>
+
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+                        <ul class="nav navbar-nav">
+                            {if $project->accepted == 1}
+                            <li><a href="{link seenAll!}"><i class="glyphicon glyphicon-check"></i> Mark all as resolved</a></li>
+                            {else}
+                            <li><a href="{link accept! $project->id}" onclick="return confirm('Are you sure?')"><i class="glyphicon glyphicon-ok"></i> Accept</a></li>
+                            <li><a href="{link decline! $project->id}" onclick="return confirm('Are you sure?')"><i class="glyphicon glyphicon-remove"></i> Decline</a></li>
+                            {/if}
+
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+</div>
+{/if}
+
     <div class="container">
         {if !isset($admin)}
         <div class="row">
@@ -39,7 +74,15 @@
 
         {if isset($admin) || $accepted > 0}
             <div class="row">
-                <div class="col-lg-12"><h1>{$project->name}</h1></div>
+                <div class="col-lg-12">
+                    <h1>
+                        {$project->name}
+                        {if isset($admin)}
+                        {$usr = $project->ref('users')}
+                         <small>{$usr->name ? $usr->name : $usr->username}</small>
+                        {/if}
+                    </h1>
+                </div>
                 <div class="col-md-6">
                     <h3>Project description:</h3>
                     {$desc|noescape}
@@ -66,6 +109,7 @@
                             {/foreach}
                         </table>
                     {/if}
+                    {if $user->isInRole('user')}
                     <div class="row">
                         <div class="col-xs-8">
                             <h3 class="section-title" style="margin-bottom: 40px;">Upload a solution</h3>
@@ -73,6 +117,7 @@
                         </div>
                         <div class="col-xs-4"></div>
                     </div>
+                    {/if}
                 </div>
                 </div>
                 <div class="row" style="margin-top: 40px">

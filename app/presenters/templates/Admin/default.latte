@@ -1,6 +1,15 @@
 {block content}
 
     <div class="container" id="admin-panel">
+    {if count($projects) == 0 && count($solutions) == 0 && count($comments) ==0}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="alert alert-success" role="alert">
+                <strong>You have no items to review!</strong>
+            </div>
+        </div>
+    </div>
+    {/if}
     <div class="row">
         {if count($projects) > 0}
         <div class="col-lg-12">
@@ -23,8 +32,8 @@
                                 <td><a href="{link Admin:project $p->id}">{$p->name}</a></td>
                                 <td>{$u->name ? $u->name : $u->username}</td>
                                 <td>
-                                    <button class="js-resolve btn btn-success btn-xs" onclick="return confirm('Are you sure?')" title="accept"><i class="glyphicon glyphicon-ok"></i></button>
-                                    <button class="js-resolve btn btn-danger btn-xs" onclick="return confirm('Are you sure?')" title="decline"><i class="glyphicon glyphicon-remove"></i></button>
+                                    <a href="{link accept! $p->id}" class="js-resolve btn btn-success btn-xs" onclick="return confirm('Are you sure?')" title="accept"><i class="glyphicon glyphicon-ok"></i></a>
+                                    <a href="{link decline! $p->id}" class="js-resolve btn btn-danger btn-xs" onclick="return confirm('Are you sure?')" title="decline"><i class="glyphicon glyphicon-remove"></i></a>
                                 </td>
                             </tr>
                         {/foreach}
@@ -90,7 +99,7 @@
                                 <td>{$u->name ? $u->name : $u->username}</td>
                                 <td>{$parsedown->parse($c->text)|striptags|truncate:50}</td>
                                 <td>
-                                    <button class="js-resolve btn btn-info btn-xs"><i class="glyphicon glyphicon-check"></i></button>
+                                    <a href="{link seenComment! $c->id}" class="js-resolve btn btn-info btn-xs"><i class="glyphicon glyphicon-check"></i></a>
                                 </td>
                             </tr>
                         {/foreach}
