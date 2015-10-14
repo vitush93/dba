@@ -53,7 +53,8 @@ class HomepagePresenter extends BasePresenter
 
         if ($accepted > 0) {
             $parsedown = new \Parsedown();
-            $this->template->desc = $parsedown->parse($project->description);
+            $desc = htmlentities($project->description, ENT_QUOTES, 'UTF-8');
+            $this->template->desc = $parsedown->parse($desc);
 
             $this->template->solutions = $this->projectManager->solutions($project->id);
             $this->template->comments = $this->database->table('comments')->where(array(

@@ -144,7 +144,8 @@ class AdminPresenter extends BasePresenter
         $this->template->admin = true;
 
         $parsedown = new \Parsedown();
-        $this->template->desc = $parsedown->parse($this->template->project->description);
+        $desc = htmlentities($this->template->project->description, ENT_QUOTES, 'UTF-8');
+        $this->template->desc = $parsedown->parse($desc);
         $this->template->parsedown = $parsedown;
     }
 
