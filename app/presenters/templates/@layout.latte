@@ -33,7 +33,8 @@
                         <ul class="nav navbar-nav">
                             <li{ifCurrent Homepage:*} class="active"{/ifCurrent}{ifCurrent Admin:default} class="active"{/ifCurrent}><a href="{link Homepage:default}">Dashboard</a></li>
                             {if $user->isInRole('admin')}
-                                <li{ifCurrent Admin:projects} class="active"{/ifCurrent}><a href="{link Admin:projects}">Projects and Students</a></li>
+                                <li{ifCurrent Admin:projects} class="active"{/ifCurrent}><a href="{link Admin:projects}">Projects</a></li>
+                                <li{ifCurrent Admin:students} class="active"{/ifCurrent}><a href="{link Admin:students}">Students</a></li>
                             {/if}
                         </ul>
 

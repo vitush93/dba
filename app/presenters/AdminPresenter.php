@@ -8,9 +8,11 @@ use App\Model\CommentingException;
 use App\Model\CommentingService;
 use App\Model\ProjectManager;
 use App\Model\UserManager;
+use Libs\BootstrapForm;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
 use Nette\Database\Context;
+use Nette\Security\Passwords;
 use Tracy\Debugger;
 
 class AdminPresenter extends BasePresenter
@@ -44,6 +46,11 @@ class AdminPresenter extends BasePresenter
         $this->template->comments = $project->related('comments')
             ->where('comments_id', null)
             ->order('bump DESC');
+    }
+
+    function renderStudents()
+    {
+        $this->template->students = $this->database->table('users')->where('role', UserManager::ROLE_USER);
     }
 
     function handleAccept($id)
@@ -175,6 +182,44 @@ class AdminPresenter extends BasePresenter
         $form = $this->solutionFormFactory->create();
 
         return $form;
+    }
+
+    function actionPwd($id)
+    {
+        $student = $this->database->table('users')->get($id);
+        if (!$student) throw new BadRequestException;
+
+        $this->template->student = $student;
+    }
+
+    function pwdFormSucceeded(Form $form, $values)
+    {
+        $this->database->table('users')->where('id', $this->getParameter('id'))->update(array(
+            UserManager::COLUMN_PASSWORD_HASH => Passwords::hash($values->password)
+        ));
+
+        $this->flashMessage('Password has been changed for the student.', 'info');
+        $this->redirect('students');
+    }
+
+    function createComponentPwdForm()
+    {
+        $form = new Form();
+
+        $form->addPassword('password', 'Password')
+            ->addRule(Form::MIN_LENGTH, 'Password must be at least 6 characters long.', 6)
+            ->setRequired()
+            ->setOption('description', 'Password must be at least 6 characters long.');
+        $form->addPassword('password2', 'Check password')
+            ->setRequired()
+            ->addRule(Form::EQUAL, 'Password does not match.', $form['password'])
+            ->setOmitted()
+            ->setOption('description', 'Enter you password again.');
+        $form->addSubmit('process', 'Change password');
+
+        $form->onSuccess[] = $this->pwdFormSucceeded;
+
+        return BootstrapForm::makeBootstrap($form);
     }
 
 }
