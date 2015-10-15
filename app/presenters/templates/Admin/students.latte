@@ -32,13 +32,16 @@
 
                             <tbody>
                             {foreach $students as $s}
-                                {var $p = $s->related('projects')->order('accepted DESC')->fetch()}
                                 <tr>
                                     <td>{$s->id}</td>
                                     <td>{$s->username}</td>
                                     <td>{$s->name}</td>
                                     <td><a href="mailtp:{$s->email}">{$s->email}</a></td>
-                                    <td><a href="{link Admin:project $p->id}">{$p->name}</a></td>
+                                    <td>
+                                        {foreach $s->related('projects') as $p}
+                                            <a href="{link Admin:project $p->id}">{$p->name}</a>{sep}, {/sep}
+                                        {/foreach}
+                                    </td>
                                     <td>
                                         <a href="{link Admin:pwd $s->id}" class="btn btn-xs btn-warning"><i class="glyphicon glyphicon-refresh"></i> password reset</a>
                                     </td>
