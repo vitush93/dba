@@ -20,12 +20,11 @@
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
                         <ul class="nav navbar-nav">
                             {if $project->accepted == 1}
-                            <li><a href="{link seenAll!}"><i class="glyphicon glyphicon-check"></i> Mark all as resolved</a></li>
-                            {else}
-                            <li><a href="{link accept! $project->id}" onclick="return confirm('Are you sure?')"><i class="glyphicon glyphicon-ok"></i> Accept</a></li>
-                            <li><a href="{link decline! $project->id}" onclick="return confirm('Are you sure?')"><i class="glyphicon glyphicon-remove"></i> Decline</a></li>
+                                <li><a href="{link seenAll!}"><i class="glyphicon glyphicon-check"></i> Mark all as resolved</a></li>
+                            {elseif $project->accepted == 0}
+                                <li><a href="{link accept! $project->id}" onclick="return confirm('Are you sure?')"><i class="glyphicon glyphicon-ok"></i> Accept</a></li>
+                                <li><a href="{link decline! $project->id}" onclick="return confirm('Are you sure?')"><i class="glyphicon glyphicon-remove"></i> Decline</a></li>
                             {/if}
-
                         </ul>
                     </div>
                 </div>

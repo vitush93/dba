@@ -17,15 +17,6 @@
                             </tr>
                             </thead>
 
-                            <tfoot>
-                            <tr>
-                                <th>Created</th>
-                                <th>Project</th>
-                                <th>Student</th>
-                                <th>Status</th>
-                            </tr>
-                            </tfoot>
-
                             <tbody>
                             {foreach $projects as $p}
                                 {var $u = $p->ref('users')}
