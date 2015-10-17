@@ -12,6 +12,7 @@ use Libs\BootstrapForm;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
 use Nette\Database\Context;
+use Nette\Database\DriverException;
 use Nette\Security\Passwords;
 use Tracy\Debugger;
 
@@ -55,11 +56,16 @@ class AdminPresenter extends BasePresenter
 
     function handleAccept($id)
     {
-        $this->database->table('projects')->where('id', $id)->update(array(
-            'accepted' => ProjectManager::STATUS_ACCEPTED
-        ));
+        try {
+            $this->database->table('projects')->where('id', $id)->update(array(
+                'accepted' => ProjectManager::STATUS_ACCEPTED
+            ));
 
-        $this->flashMessage('Project has been marked as accepted.', 'info');
+            $this->flashMessage('Project has been marked as accepted.', 'info');
+        } catch (DriverException $e) {
+            $this->flashMessage('This student already has an accepted project!', 'danger');
+        }
+
         $this->redirect('this');
     }
 

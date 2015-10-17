@@ -29,10 +29,11 @@ class ProjectManager extends Object
      * @param $name
      * @param $desc
      * @param $user_id
+     * @return bool|int|\Nette\Database\Table\IRow
      */
     function add($name, $desc, $user_id)
     {
-        $this->database->table(self::TABLE_NAME)->insert(array(
+        return $this->database->table(self::TABLE_NAME)->insert(array(
             'name' => $name,
             'description' => $desc,
             'users_id' => $user_id

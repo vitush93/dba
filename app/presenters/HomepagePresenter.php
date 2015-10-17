@@ -5,8 +5,10 @@ namespace App\Presenters;
 use App\Forms\SolutionFormFactory;
 use App\Model;
 use Libs\BootstrapForm;
+use Libs\Utils;
 use Nette\Application\UI\Form;
 use Nette\Database\Context;
+use Nette\Database\UniqueConstraintViolationException;
 use Tracy\Debugger;
 
 
@@ -95,7 +97,25 @@ class HomepagePresenter extends BasePresenter
      */
     function projectFormSucceeded(Form $form, $values)
     {
-        $this->projectManager->add($values->name, $values->description, $this->user->id);
+        $new_project = $this->projectManager->add($values->name, $values->description, $this->user->id);
+
+        foreach (Utils::safeExplodeByComma($values->tags) as $tag) {
+            try {
+                $project_tag = $this->database->table('tags')->insert(array(
+                    'tag' => $tag
+                ));
+
+                $tag_id = $project_tag->id;
+            } catch (UniqueConstraintViolationException $e) {
+                $tag_id = $this->database->table('tags')->where('tag', $tag)->fetch()->id;
+            }
+
+            $this->database->table('projects_tags')->insert(array(
+                'projects_id' => $new_project->id,
+                'tags_id' => $tag_id
+            ));
+        }
+
         $this->flashMessage("Project $values->name has been successfully created!", 'success');
     }
 
@@ -116,10 +136,13 @@ class HomepagePresenter extends BasePresenter
     {
         $form = new Form();
 
-        $form->addText('name', 'Project name')->setRequired();
+        $form->addText('name', 'Project name')
+            ->setRequired();
+        $form->addText('tags', 'Tags')
+            ->setOption('description', 'Comma-delimited project tags e.g. PostgreSQL, MS SQL etc.');
         $form->addTextArea('description', 'Project description')
             ->setAttribute('rows', 10)
-            ->setOption('description', 'You can use Markdown syntax')
+            ->setOption('description', 'You can use Markdown syntax.')
             ->setRequired();
         $form->addSubmit('process', 'Create');
 
