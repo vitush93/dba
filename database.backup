@@ -4,7 +4,7 @@
 
 -- Dumped from database version 9.4.5
 -- Dumped by pg_dump version 9.4.0
--- Started on 2015-10-17 23:47:39
+-- Started on 2015-10-18 02:37:30
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -24,7 +24,7 @@ CREATE SCHEMA dba;
 ALTER SCHEMA dba OWNER TO postgres;
 
 --
--- TOC entry 184 (class 3079 OID 11855)
+-- TOC entry 186 (class 3079 OID 11855)
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
 --
 
@@ -32,8 +32,8 @@ CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
--- TOC entry 2085 (class 0 OID 0)
--- Dependencies: 184
+-- TOC entry 2095 (class 0 OID 0)
+-- Dependencies: 186
 -- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
 --
 
@@ -43,7 +43,7 @@ COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 SET search_path = dba, pg_catalog;
 
 --
--- TOC entry 197 (class 1255 OID 16548)
+-- TOC entry 199 (class 1255 OID 16548)
 -- Name: check_projects(); Type: FUNCTION; Schema: dba; Owner: postgres
 --
 
@@ -85,7 +85,7 @@ CREATE TABLE comments (
 ALTER TABLE comments OWNER TO postgres;
 
 --
--- TOC entry 2086 (class 0 OID 0)
+-- TOC entry 2096 (class 0 OID 0)
 -- Dependencies: 173
 -- Name: COLUMN comments.seen; Type: COMMENT; Schema: dba; Owner: postgres
 --
@@ -109,7 +109,7 @@ CREATE SEQUENCE comments_id_seq
 ALTER TABLE comments_id_seq OWNER TO postgres;
 
 --
--- TOC entry 2087 (class 0 OID 0)
+-- TOC entry 2097 (class 0 OID 0)
 -- Dependencies: 174
 -- Name: comments_id_seq; Type: SEQUENCE OWNED BY; Schema: dba; Owner: postgres
 --
@@ -135,7 +135,7 @@ CREATE TABLE projects (
 ALTER TABLE projects OWNER TO postgres;
 
 --
--- TOC entry 2088 (class 0 OID 0)
+-- TOC entry 2098 (class 0 OID 0)
 -- Dependencies: 175
 -- Name: COLUMN projects.accepted; Type: COMMENT; Schema: dba; Owner: postgres
 --
@@ -161,7 +161,7 @@ CREATE SEQUENCE projects_id_seq
 ALTER TABLE projects_id_seq OWNER TO postgres;
 
 --
--- TOC entry 2089 (class 0 OID 0)
+-- TOC entry 2099 (class 0 OID 0)
 -- Dependencies: 176
 -- Name: projects_id_seq; Type: SEQUENCE OWNED BY; Schema: dba; Owner: postgres
 --
@@ -183,6 +183,52 @@ CREATE TABLE projects_tags (
 ALTER TABLE projects_tags OWNER TO postgres;
 
 --
+-- TOC entry 179 (class 1259 OID 16579)
+-- Name: users; Type: TABLE; Schema: dba; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE users (
+    id integer NOT NULL,
+    username character varying(255) NOT NULL,
+    password character varying(255) NOT NULL,
+    email character varying(255) NOT NULL,
+    role character varying(255) NOT NULL,
+    name character varying(255),
+    registered timestamp without time zone DEFAULT statement_timestamp() NOT NULL
+);
+
+
+ALTER TABLE users OWNER TO postgres;
+
+--
+-- TOC entry 2100 (class 0 OID 0)
+-- Dependencies: 179
+-- Name: COLUMN users.username; Type: COMMENT; Schema: dba; Owner: postgres
+--
+
+COMMENT ON COLUMN users.username IS '
+';
+
+
+--
+-- TOC entry 185 (class 1259 OID 16887)
+-- Name: projects_this_year; Type: VIEW; Schema: dba; Owner: postgres
+--
+
+CREATE VIEW projects_this_year AS
+ SELECT projects.name AS project,
+    projects.description,
+    users.username AS student_username,
+    users.name AS student
+   FROM (projects
+     LEFT JOIN users ON ((projects.users_id = users.id)))
+  WHERE ((projects.accepted = 1) AND (date_part('year'::text, projects.created) = date_part('year'::text, now())))
+  ORDER BY users.name;
+
+
+ALTER TABLE projects_this_year OWNER TO postgres;
+
+--
 -- TOC entry 177 (class 1259 OID 16569)
 -- Name: solutions; Type: TABLE; Schema: dba; Owner: postgres; Tablespace: 
 --
@@ -200,7 +246,7 @@ CREATE TABLE solutions (
 ALTER TABLE solutions OWNER TO postgres;
 
 --
--- TOC entry 2090 (class 0 OID 0)
+-- TOC entry 2101 (class 0 OID 0)
 -- Dependencies: 177
 -- Name: COLUMN solutions.seen; Type: COMMENT; Schema: dba; Owner: postgres
 --
@@ -224,13 +270,32 @@ CREATE SEQUENCE solutions_id_seq
 ALTER TABLE solutions_id_seq OWNER TO postgres;
 
 --
--- TOC entry 2091 (class 0 OID 0)
+-- TOC entry 2102 (class 0 OID 0)
 -- Dependencies: 178
 -- Name: solutions_id_seq; Type: SEQUENCE OWNED BY; Schema: dba; Owner: postgres
 --
 
 ALTER SEQUENCE solutions_id_seq OWNED BY solutions.id;
 
+
+--
+-- TOC entry 184 (class 1259 OID 16883)
+-- Name: students_this_year; Type: VIEW; Schema: dba; Owner: postgres
+--
+
+CREATE VIEW students_this_year AS
+ SELECT users.username,
+    users.name,
+    users.email,
+    users.registered,
+    projects.name AS project
+   FROM (projects
+     LEFT JOIN users ON ((projects.users_id = users.id)))
+  WHERE ((projects.accepted = 1) AND (date_part('year'::text, users.registered) = date_part('year'::text, now())))
+  ORDER BY users.name;
+
+
+ALTER TABLE students_this_year OWNER TO postgres;
 
 --
 -- TOC entry 182 (class 1259 OID 16657)
@@ -261,40 +326,12 @@ CREATE SEQUENCE tags_id_seq
 ALTER TABLE tags_id_seq OWNER TO postgres;
 
 --
--- TOC entry 2092 (class 0 OID 0)
+-- TOC entry 2103 (class 0 OID 0)
 -- Dependencies: 181
 -- Name: tags_id_seq; Type: SEQUENCE OWNED BY; Schema: dba; Owner: postgres
 --
 
 ALTER SEQUENCE tags_id_seq OWNED BY tags.id;
-
-
---
--- TOC entry 179 (class 1259 OID 16579)
--- Name: users; Type: TABLE; Schema: dba; Owner: postgres; Tablespace: 
---
-
-CREATE TABLE users (
-    id integer NOT NULL,
-    username character varying(255) NOT NULL,
-    password character varying(255) NOT NULL,
-    email character varying(255) NOT NULL,
-    role character varying(255) NOT NULL,
-    name character varying(255),
-    registered timestamp without time zone DEFAULT statement_timestamp() NOT NULL
-);
-
-
-ALTER TABLE users OWNER TO postgres;
-
---
--- TOC entry 2093 (class 0 OID 0)
--- Dependencies: 179
--- Name: COLUMN users.username; Type: COMMENT; Schema: dba; Owner: postgres
---
-
-COMMENT ON COLUMN users.username IS '
-';
 
 
 --
@@ -313,7 +350,7 @@ CREATE SEQUENCE user_id_seq
 ALTER TABLE user_id_seq OWNER TO postgres;
 
 --
--- TOC entry 2094 (class 0 OID 0)
+-- TOC entry 2104 (class 0 OID 0)
 -- Dependencies: 180
 -- Name: user_id_seq; Type: SEQUENCE OWNED BY; Schema: dba; Owner: postgres
 --
@@ -322,7 +359,7 @@ ALTER SEQUENCE user_id_seq OWNED BY users.id;
 
 
 --
--- TOC entry 1917 (class 2604 OID 16587)
+-- TOC entry 1925 (class 2604 OID 16587)
 -- Name: id; Type: DEFAULT; Schema: dba; Owner: postgres
 --
 
@@ -330,7 +367,7 @@ ALTER TABLE ONLY comments ALTER COLUMN id SET DEFAULT nextval('comments_id_seq':
 
 
 --
--- TOC entry 1920 (class 2604 OID 16588)
+-- TOC entry 1928 (class 2604 OID 16588)
 -- Name: id; Type: DEFAULT; Schema: dba; Owner: postgres
 --
 
@@ -338,7 +375,7 @@ ALTER TABLE ONLY projects ALTER COLUMN id SET DEFAULT nextval('projects_id_seq':
 
 
 --
--- TOC entry 1923 (class 2604 OID 16589)
+-- TOC entry 1931 (class 2604 OID 16589)
 -- Name: id; Type: DEFAULT; Schema: dba; Owner: postgres
 --
 
@@ -346,7 +383,7 @@ ALTER TABLE ONLY solutions ALTER COLUMN id SET DEFAULT nextval('solutions_id_seq
 
 
 --
--- TOC entry 1926 (class 2604 OID 16660)
+-- TOC entry 1934 (class 2604 OID 16660)
 -- Name: id; Type: DEFAULT; Schema: dba; Owner: postgres
 --
 
@@ -354,7 +391,7 @@ ALTER TABLE ONLY tags ALTER COLUMN id SET DEFAULT nextval('tags_id_seq'::regclas
 
 
 --
--- TOC entry 1924 (class 2604 OID 16590)
+-- TOC entry 1932 (class 2604 OID 16590)
 -- Name: id; Type: DEFAULT; Schema: dba; Owner: postgres
 --
 
@@ -362,7 +399,7 @@ ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('user_id_seq'::regcla
 
 
 --
--- TOC entry 1931 (class 2606 OID 16592)
+-- TOC entry 1939 (class 2606 OID 16592)
 -- Name: PK_comments; Type: CONSTRAINT; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -371,7 +408,7 @@ ALTER TABLE ONLY comments
 
 
 --
--- TOC entry 1936 (class 2606 OID 16594)
+-- TOC entry 1944 (class 2606 OID 16594)
 -- Name: PK_projects; Type: CONSTRAINT; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -380,7 +417,7 @@ ALTER TABLE ONLY projects
 
 
 --
--- TOC entry 1940 (class 2606 OID 16596)
+-- TOC entry 1948 (class 2606 OID 16596)
 -- Name: PK_solutions; Type: CONSTRAINT; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -389,7 +426,7 @@ ALTER TABLE ONLY solutions
 
 
 --
--- TOC entry 1944 (class 2606 OID 16598)
+-- TOC entry 1952 (class 2606 OID 16598)
 -- Name: PK_users; Type: CONSTRAINT; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -398,7 +435,7 @@ ALTER TABLE ONLY users
 
 
 --
--- TOC entry 1958 (class 2606 OID 16670)
+-- TOC entry 1966 (class 2606 OID 16670)
 -- Name: PRIMARY_projects_tags; Type: CONSTRAINT; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -407,7 +444,7 @@ ALTER TABLE ONLY projects_tags
 
 
 --
--- TOC entry 1953 (class 2606 OID 16662)
+-- TOC entry 1961 (class 2606 OID 16662)
 -- Name: PRIMARY_tags; Type: CONSTRAINT; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -416,7 +453,7 @@ ALTER TABLE ONLY tags
 
 
 --
--- TOC entry 1946 (class 2606 OID 16600)
+-- TOC entry 1954 (class 2606 OID 16600)
 -- Name: UNIQ_email; Type: CONSTRAINT; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -425,7 +462,7 @@ ALTER TABLE ONLY users
 
 
 --
--- TOC entry 1955 (class 2606 OID 16664)
+-- TOC entry 1963 (class 2606 OID 16664)
 -- Name: UNIQ_tag; Type: CONSTRAINT; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -434,7 +471,7 @@ ALTER TABLE ONLY tags
 
 
 --
--- TOC entry 1948 (class 2606 OID 16602)
+-- TOC entry 1956 (class 2606 OID 16602)
 -- Name: UNIQ_username; Type: CONSTRAINT; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -443,7 +480,7 @@ ALTER TABLE ONLY users
 
 
 --
--- TOC entry 1927 (class 1259 OID 16603)
+-- TOC entry 1935 (class 1259 OID 16603)
 -- Name: FKI_comments_comments; Type: INDEX; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -451,7 +488,7 @@ CREATE INDEX "FKI_comments_comments" ON comments USING btree (comments_id);
 
 
 --
--- TOC entry 1928 (class 1259 OID 16604)
+-- TOC entry 1936 (class 1259 OID 16604)
 -- Name: FKI_comments_projects; Type: INDEX; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -459,7 +496,7 @@ CREATE INDEX "FKI_comments_projects" ON comments USING btree (projects_id);
 
 
 --
--- TOC entry 1929 (class 1259 OID 16605)
+-- TOC entry 1937 (class 1259 OID 16605)
 -- Name: FKI_comments_users; Type: INDEX; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -467,7 +504,7 @@ CREATE INDEX "FKI_comments_users" ON comments USING btree (users_id);
 
 
 --
--- TOC entry 1934 (class 1259 OID 16606)
+-- TOC entry 1942 (class 1259 OID 16606)
 -- Name: FKI_projects_users; Type: INDEX; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -475,7 +512,7 @@ CREATE INDEX "FKI_projects_users" ON projects USING btree (users_id);
 
 
 --
--- TOC entry 1938 (class 1259 OID 16607)
+-- TOC entry 1946 (class 1259 OID 16607)
 -- Name: FKI_solutions_projects; Type: INDEX; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -483,7 +520,7 @@ CREATE INDEX "FKI_solutions_projects" ON solutions USING btree (projects_id);
 
 
 --
--- TOC entry 1949 (class 1259 OID 16608)
+-- TOC entry 1957 (class 1259 OID 16608)
 -- Name: email; Type: INDEX; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -491,7 +528,7 @@ CREATE INDEX email ON users USING btree (email);
 
 
 --
--- TOC entry 1932 (class 1259 OID 16609)
+-- TOC entry 1940 (class 1259 OID 16609)
 -- Name: idx_bump; Type: INDEX; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -499,7 +536,7 @@ CREATE INDEX idx_bump ON comments USING btree (bump);
 
 
 --
--- TOC entry 1959 (class 1259 OID 16681)
+-- TOC entry 1967 (class 1259 OID 16681)
 -- Name: idx_clstr; Type: INDEX; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -509,7 +546,7 @@ ALTER TABLE projects_tags CLUSTER ON idx_clstr;
 
 
 --
--- TOC entry 1933 (class 1259 OID 16610)
+-- TOC entry 1941 (class 1259 OID 16610)
 -- Name: idx_partial_seen; Type: INDEX; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -517,7 +554,7 @@ CREATE INDEX idx_partial_seen ON comments USING btree (seen) WHERE (seen = false
 
 
 --
--- TOC entry 1941 (class 1259 OID 16611)
+-- TOC entry 1949 (class 1259 OID 16611)
 -- Name: idx_partial_seen_solutions; Type: INDEX; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -525,7 +562,7 @@ CREATE INDEX idx_partial_seen_solutions ON solutions USING btree (seen) WHERE (s
 
 
 --
--- TOC entry 1937 (class 1259 OID 16612)
+-- TOC entry 1945 (class 1259 OID 16612)
 -- Name: idx_projects_created; Type: INDEX; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -533,7 +570,7 @@ CREATE INDEX idx_projects_created ON projects USING btree (id);
 
 
 --
--- TOC entry 1956 (class 1259 OID 16665)
+-- TOC entry 1964 (class 1259 OID 16665)
 -- Name: idx_tag; Type: INDEX; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -541,7 +578,7 @@ CREATE INDEX idx_tag ON tags USING btree (tag);
 
 
 --
--- TOC entry 1960 (class 1259 OID 16682)
+-- TOC entry 1968 (class 1259 OID 16682)
 -- Name: idx_tags_projects; Type: INDEX; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -549,7 +586,7 @@ CREATE INDEX idx_tags_projects ON projects_tags USING btree (tags_id, projects_i
 
 
 --
--- TOC entry 1942 (class 1259 OID 16613)
+-- TOC entry 1950 (class 1259 OID 16613)
 -- Name: idx_uploaded; Type: INDEX; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -557,7 +594,7 @@ CREATE INDEX idx_uploaded ON solutions USING btree (uploaded);
 
 
 --
--- TOC entry 1950 (class 1259 OID 16614)
+-- TOC entry 1958 (class 1259 OID 16614)
 -- Name: role; Type: INDEX; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -565,7 +602,7 @@ CREATE INDEX role ON users USING hash (role);
 
 
 --
--- TOC entry 1951 (class 1259 OID 16615)
+-- TOC entry 1959 (class 1259 OID 16615)
 -- Name: username; Type: INDEX; Schema: dba; Owner: postgres; Tablespace: 
 --
 
@@ -573,7 +610,7 @@ CREATE INDEX username ON users USING btree (username);
 
 
 --
--- TOC entry 1968 (class 2620 OID 16616)
+-- TOC entry 1976 (class 2620 OID 16616)
 -- Name: trg_prevent_multiple_accepted; Type: TRIGGER; Schema: dba; Owner: postgres
 --
 
@@ -581,8 +618,8 @@ CREATE TRIGGER trg_prevent_multiple_accepted BEFORE INSERT OR UPDATE ON projects
 
 
 --
--- TOC entry 2095 (class 0 OID 0)
--- Dependencies: 1968
+-- TOC entry 2105 (class 0 OID 0)
+-- Dependencies: 1976
 -- Name: TRIGGER trg_prevent_multiple_accepted ON projects; Type: COMMENT; Schema: dba; Owner: postgres
 --
 
@@ -590,7 +627,7 @@ COMMENT ON TRIGGER trg_prevent_multiple_accepted ON projects IS 'this trigger pr
 
 
 --
--- TOC entry 1961 (class 2606 OID 16617)
+-- TOC entry 1969 (class 2606 OID 16617)
 -- Name: FK_comments_comments; Type: FK CONSTRAINT; Schema: dba; Owner: postgres
 --
 
@@ -599,7 +636,7 @@ ALTER TABLE ONLY comments
 
 
 --
--- TOC entry 1962 (class 2606 OID 16622)
+-- TOC entry 1970 (class 2606 OID 16622)
 -- Name: FK_comments_projects; Type: FK CONSTRAINT; Schema: dba; Owner: postgres
 --
 
@@ -608,7 +645,7 @@ ALTER TABLE ONLY comments
 
 
 --
--- TOC entry 1963 (class 2606 OID 16627)
+-- TOC entry 1971 (class 2606 OID 16627)
 -- Name: FK_comments_users; Type: FK CONSTRAINT; Schema: dba; Owner: postgres
 --
 
@@ -617,7 +654,7 @@ ALTER TABLE ONLY comments
 
 
 --
--- TOC entry 1964 (class 2606 OID 16632)
+-- TOC entry 1972 (class 2606 OID 16632)
 -- Name: FK_projects_users; Type: FK CONSTRAINT; Schema: dba; Owner: postgres
 --
 
@@ -626,7 +663,7 @@ ALTER TABLE ONLY projects
 
 
 --
--- TOC entry 1965 (class 2606 OID 16637)
+-- TOC entry 1973 (class 2606 OID 16637)
 -- Name: FK_solutions_projects; Type: FK CONSTRAINT; Schema: dba; Owner: postgres
 --
 
@@ -635,7 +672,7 @@ ALTER TABLE ONLY solutions
 
 
 --
--- TOC entry 1966 (class 2606 OID 16671)
+-- TOC entry 1974 (class 2606 OID 16671)
 -- Name: FK_tags_projects; Type: FK CONSTRAINT; Schema: dba; Owner: postgres
 --
 
@@ -644,7 +681,7 @@ ALTER TABLE ONLY projects_tags
 
 
 --
--- TOC entry 1967 (class 2606 OID 16676)
+-- TOC entry 1975 (class 2606 OID 16676)
 -- Name: FK_tags_tags; Type: FK CONSTRAINT; Schema: dba; Owner: postgres
 --
 
@@ -653,7 +690,7 @@ ALTER TABLE ONLY projects_tags
 
 
 --
--- TOC entry 2084 (class 0 OID 0)
+-- TOC entry 2094 (class 0 OID 0)
 -- Dependencies: 7
 -- Name: public; Type: ACL; Schema: -; Owner: postgres
 --
@@ -664,7 +701,7 @@ GRANT ALL ON SCHEMA public TO postgres;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
--- Completed on 2015-10-17 23:47:39
+-- Completed on 2015-10-18 02:37:31
 
 --
 -- PostgreSQL database dump complete
