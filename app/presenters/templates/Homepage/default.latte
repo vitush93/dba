@@ -25,6 +25,9 @@
                                 <li><a href="{link accept! $project->id}" onclick="return confirm('Are you sure?')"><i class="glyphicon glyphicon-ok"></i> Accept</a></li>
                                 <li><a href="{link decline! $project->id}" onclick="return confirm('Are you sure?')"><i class="glyphicon glyphicon-remove"></i> Decline</a></li>
                             {/if}
+                            {if $project->completed == 0}
+                                <li><a href="{link complete!}">Mark as completed</a></li>
+                            {/if}
                         </ul>
                     </div>
                 </div>
