@@ -35,6 +35,12 @@
                                         {elseif $a == 2}
                                             Declined
                                         {/if}
+
+                                        {if $p->completed == 1}
+                                             & Completed
+                                        {else}
+                                            & Not Completed
+                                        {/if}
                                     </td>
                                 </tr>
                             {/foreach}

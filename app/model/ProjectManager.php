@@ -12,7 +12,9 @@ class ProjectManager extends Object
     const
         STATUS_AWAITING = 0,
         STATUS_ACCEPTED = 1,
-        STATUS_DECLINED = 2;
+        STATUS_DECLINED = 2,
+        STATUS_NOT_COMPLETED = 0,
+        STATUS_COMPLETED = 1;
 
     /** @var Context */
     private $database;

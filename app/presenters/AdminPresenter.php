@@ -89,6 +89,16 @@ class AdminPresenter extends BasePresenter
         $this->redirect('this');
     }
 
+    function handleComplete($id)
+    {
+        $this->database->table('projects')->where('id', $id)->update(array(
+            'completed' => ProjectManager::STATUS_COMPLETED
+        ));
+
+        $this->flashMessage('Project has been marked as completed.', 'info');
+        $this->redirect('this');
+    }
+
     function handleSeenComment($id)
     {
         $this->database->table('comments')->where('id', $id)->update(array(
