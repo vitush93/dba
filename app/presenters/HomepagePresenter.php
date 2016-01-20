@@ -17,9 +17,6 @@ class HomepagePresenter extends BasePresenter
     /** @var Model\ProjectManager @inject */
     public $projectManager;
 
-    /** @var Context @inject */
-    public $database;
-
     /** @var SolutionFormFactory @inject */
     public $solutionFormFactory;
 

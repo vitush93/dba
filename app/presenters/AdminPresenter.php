@@ -18,9 +18,6 @@ use Tracy\Debugger;
 
 class AdminPresenter extends BasePresenter
 {
-    /** @var Context @inject */
-    public $database;
-
     /** @var ProjectManager @inject */
     public $projectManager;
 

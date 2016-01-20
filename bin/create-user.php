@@ -16,6 +16,10 @@ $container = require __DIR__ . '/../app/bootstrap.php';
 /** @var \App\Model\UserManager $manager */
 $manager = $container->getByType('App\Model\UserManager');
 
+/** @var \Nette\Database\Context $database */
+$database = $container->getByType('Nette\Database\Context');
+$database->query("SET search_path TO dba");
+
 try {
     $manager->add($name, $password, $email, $role);
     echo "User $name was added.\n";
